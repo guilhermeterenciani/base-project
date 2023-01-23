@@ -1,0 +1,26 @@
+version: '3.4'
+
+services:
+  app:
+    image: app
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: development
+    ports:
+      - 3001:3000
+    volumes:
+      - .:/app
+    command: ["npm","run", "dev"]
+  mysql:
+    image: mysql:latest
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: terenciani
+      MYSQL_PASSWORD: 123456
+    volumes:
+      - ./mysql:/var/lib/mysql
