@@ -1,7 +1,11 @@
-import express from 'express';   // Import express
+import express, {Request} from 'express';   // Import express
+import cors from 'cors';   // Import cors
 import mysql from 'mysql2';   // Import mysql
+import fileUpload from 'express-fileupload';  // Import fileUpload
 const app = express();   // Create express app
 
+app.use(cors());   // Use cors
+app.use(fileUpload());
 
 const db = mysql.createConnection({
     host: 'mysql',
@@ -23,6 +27,38 @@ app.get('/', (req, res) => {
             });
     
     });
+});
+
+
+app.post('/user/upload', (req, res) => {
+    //console.log("tentando mostrar o arquivo enviado.");
+    //console.log(req.files?.arquivo);
+    if(!req.files) {
+        res.send({
+            status: 400,
+            message: 'No file uploaded'
+        });
+        return
+    }
+    const uploadFiles = req.files.arquivo;
+    if(Array.isArray(uploadFiles)) {
+        uploadFiles.forEach(uploadFile => {
+            const prefix = Date.now()+"-"+uploadFile.name;
+            uploadFile.mv('./files/upload/'+prefix, (err) => {
+                if(err) {
+                    res.status(500).send(err);
+                }
+            });
+        });
+        return
+    }
+    const prefix = Date.now()+"-"+uploadFiles.name;
+    uploadFiles.mv('./files/upload/'+prefix, (err) => {
+        if(err) {
+            res.status(500).send(err);
+        }
+    });
+    res.send("file uploaded");
 });
 
 
